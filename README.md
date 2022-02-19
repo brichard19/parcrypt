@@ -97,7 +97,8 @@ Start the client by running `parcrypt` (Linux) or `parcrypt.exe` (Windows) from 
 
 The client will detect the GPUs and wait for work from the server.
 
-When it receives work it will display the progress: (screenshot here)
+When it receives work it will display the progress:
+![alt text](https://github.com/brichard19/parcrypt/blob/main/screenshots/parcrypt-client.png?raw=true)
 
 ### Results
 If a key is found the server will log it to the output and also save it to a text file located in the same directory as the project database.
