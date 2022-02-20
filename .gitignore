@@ -364,3 +364,13 @@ FodyWeavers.xsd
 
 # Linux object files
 *.o
+
+# Python
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+#Visual Studio
+.vscode
+.vs
