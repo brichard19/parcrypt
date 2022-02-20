@@ -374,3 +374,7 @@ __pycache__/
 #Visual Studio
 .vscode
 .vs
+
+# parcrypt files
+btc_pub_key_hash.cl
+btc_pub_key_hash_cl.cpp
