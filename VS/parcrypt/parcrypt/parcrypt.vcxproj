@@ -127,6 +127,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\third_party\curl\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcurl.lib;Wldap32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\..\bin" mkdir "$(SolutionDir)..\..\bin"
+copy "$(SolutionDir)\x64\$(Configuration)\parcrypt.exe" "$(SolutionDir)..\..\bin"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -148,6 +152,10 @@
       <AdditionalLibraryDirectories>$(SolutionDir)..\..\third_party\curl\lib\win64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libcurl.lib;Wldap32.lib;Ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if not exist "$(SolutionDir)..\..\bin" mkdir "$(SolutionDir)..\..\bin"
+copy "$(SolutionDir)\x64\$(Configuration)\parcrypt.exe" "$(SolutionDir)..\..\bin"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\address\address.vcxproj">
