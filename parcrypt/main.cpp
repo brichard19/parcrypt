@@ -140,34 +140,50 @@ bool get_work_from_server()
 
 void worker_thread(WorkerSlot* d, parcrypt::IWorkItem* work_item_ptr)
 {
-
   std::string type = work_item_ptr->parent()->type();
 
   auto f = parcrypt::worker_factories();
 
   if(f.find(type) == f.end()) {
     d->in_use = false;
-    throw std::runtime_error("Unknown work item type");
+    LOG(LogLevel::Error) << "Unknown work unit type: " << type;
+    return;
   }
+
+  WorkerThreadState* state = nullptr;
+  
+  try {
+    state = new WorkerThreadState(d->gpu);
+  } catch(gpulib::Exception& ex) {
+    LOG(LogLevel::Error) << "GPU error: " << ex.get_msg();
+    return;
+  }
+
+  state->set_run_flag(&_running);
+  state->set_state(WorkerState::Idle);
+  state->set_work_item(work_item_ptr);
+
+  add_thread(state);
 
   try {
-    WorkerThreadState state(d->gpu);
-    state.set_run_flag(&_running);
-    state.set_state(WorkerState::Idle);
-    state.set_work_item(work_item_ptr);
-
-    add_thread(&state);
-
-    f[type](&state, work_item_ptr);
-    state.set_work_item(nullptr);
-
-    return_work(work_item_ptr);
-
-    // Remove thread state
-    remove_thread(&state);
+    LOG(LogLevel::Info) << d->gpu.device_info.device_name << " starting " << work_item_ptr->parent()->id();
+    f[type](state, work_item_ptr);
+  } catch(gpulib::Exception& e) {
+    work_item_ptr->set_status(parcrypt::IWorkItem::Status::Aborted);
+    LOG(LogLevel::Error) << "GPU error: " << e.get_msg();
+  } catch(std::exception& e) {
+    work_item_ptr->set_status(parcrypt::IWorkItem::Status::Aborted);
+    LOG(LogLevel::Error) << "Error: " << e.what();
   } catch(...) {
-    LOG(LogLevel::Error) << "Worker thread died";
+    work_item_ptr->set_status(parcrypt::IWorkItem::Status::Aborted);
+    LOG(LogLevel::Error) << "Error: Unkown error";
   }
+
+  state->set_work_item(nullptr);
+  return_work(work_item_ptr);
+
+  // Remove thread state
+  remove_thread(state);
 
   d->in_use = false;
 }
@@ -364,6 +380,9 @@ void status_thread_function()
   } catch(std::exception& ex) {
     LOG(LogLevel::Error) << "Status thread died: " << ex.what();
     _running = false;
+  } catch(...) {
+    LOG(LogLevel::Error) << "Status thread died";
+    _running = false;
   }
 }
 
@@ -477,6 +496,7 @@ int main(int argc, char** argv)
   platform::set_console_handler(console_handler);
 
   run();
+
 
   return 0;
 }
