@@ -185,6 +185,7 @@ void worker_thread(WorkerSlot* d, parcrypt::IWorkItem* work_item_ptr)
   // Remove thread state
   remove_thread(state);
 
+  delete state;
   d->in_use = false;
 }
 
