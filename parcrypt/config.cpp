@@ -1,9 +1,7 @@
 #include <exception>
-
 #include "config.h"
-
 #include "json11.hpp"
-
+#include "logger.h"
 #include "platform.h"
 
 Config load_config(const std::string& path)
@@ -49,15 +47,32 @@ Config load_config(const std::string& path)
     auto items = i.object_items();
     if(items.find("opencl") != items.end()) {
       gpu_config.device_id = items["opencl"].int_value();
+      gpu_config.api = (int)gpulib::DeviceType::OpenCL;
     } else if(items.find("cuda") != items.end()) {
       gpu_config.device_id = items["cuda"].int_value();
+      gpu_config.api = (int)(int)gpulib::DeviceType::CUDA;
     } else {
       throw std::runtime_error("expected 'opencl' or 'cuda'");
+    }
+
+    // Ensure no duplicates
+    bool skip = false;
+    for(auto& d : config.gpu_devices) {
+      if(d.api == gpu_config.api && d.device_id == gpu_config.device_id) {
+        LOG(LogLevel::Warning) << "Duplicate device in config. Skipping";
+        skip = true;
+        break;
+      }
+    }
+
+    if(skip) {
+      continue;
     }
 
     if(items.find("mem_usage") != items.end()) {
       gpu_config.mem_usage = (float)items["mem_usage"].number_value();
     }
+
 
     config.gpu_devices.push_back(gpu_config);
   }
