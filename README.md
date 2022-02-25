@@ -112,7 +112,7 @@ If a key is found the server will log it to the output and also save it to a tex
 
 ##### Requirements
 - Visual Studio 2019 or newer
-
+- python3
 To build the client, build the `parcrypt` project in the Visual Studio solution.
 
 #### Linux
