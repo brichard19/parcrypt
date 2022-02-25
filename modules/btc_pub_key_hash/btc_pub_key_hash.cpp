@@ -11,41 +11,38 @@ void parcrypt::btc_pubkey_worker(WorkerThreadState* state, parcrypt::IWorkItem* 
   parcrypt::BruteForceWorkItem* work_item = reinterpret_cast<parcrypt::BruteForceWorkItem*>(work_item_ptr);
 
   state->set_state(WorkerState::Initializing);
-  BTCPubKeyHashGPU* device = new BTCPubKeyHashGPU(state->gpu);
+  BTCPubKeyHashGPU device(state->gpu);
 
-  device->set_mem_usage(state->gpu_config.mem_usage);
+  device.set_mem_usage(state->gpu_config.mem_usage);
 
-  device->init(work_item->start(), work_item->end(), work_item->target());
+  device.init(work_item->start(), work_item->end(), work_item->target());
 
   state->set_state(WorkerState::Running);
 
-  device->start();
-  while(!device->done()) {
+  device.start();
+  while(!device.done()) {
     platform::sleep(1.0);
 
-    state->set_progress(device->progress());
-    state->set_rate(device->key_rate());
+    state->set_progress(device.progress());
+    state->set_rate(device.key_rate());
 
     // Program still running?
     if(!state->running()) {
-      device->stop();
+      device.stop();
       break;
     }
   }
 
-
-  if(device->done()) {
+  if(device.done()) {
     work_item->set_status(parcrypt::IWorkItem::Completed);
 
     secp256k1::uint256 private_key;
 
-    if(device->get_result(private_key)) {
+    if(device.get_result(private_key)) {
       std::string private_key_str = private_key.to_string();
       work_item->set_private_key(private_key_str);
     }
   } else {
     work_item->set_status(parcrypt::IWorkItem::Aborted);
   }
-
-  delete device;
 }
