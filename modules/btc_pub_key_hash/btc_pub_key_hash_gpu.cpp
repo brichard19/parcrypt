@@ -342,7 +342,6 @@ void BTCPubKeyHashGPU::step()
   if(_key_current > _key_end) {
     _done = true;
   }
-
 }
 
 void BTCPubKeyHashGPU::sanity_check()

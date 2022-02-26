@@ -56,77 +56,41 @@ void print_uint256(uint256_t x)
 // Add with carry
 uint addc(uint a, uint b, uint* carry)
 {
-  uint sum = a + *carry;
+  ulong sum = (ulong)a + b + *carry;
 
-  uint c1 = (sum < a) ? 1 : 0;
+  *carry = (uint)(sum >> 32);
 
-  sum = sum + b;
-
-  uint c2 = (sum < b) ? 1 : 0;
-
-  *carry = c1 | c2;
-
-  return sum;
+  return (uint)sum;
 }
 
 // Subtract with borrow
 uint subc(uint a, uint b, uint* borrow)
 {
-  uint diff = a - *borrow;
+  ulong diff = (ulong)a - b - *borrow;
 
-  *borrow = (diff > a) ? 1 : 0;
+  *borrow = (uint)((diff >> 32) & 1);
 
-  uint diff2 = diff - b;
-
-  *borrow |= (diff2 > diff) ? 1 : 0;
-
-  return diff2;
+  return (uint)diff;
 }
 
-#ifdef DEVICE_VENDOR_INTEL
-
-// Intel devices have a mul_hi bug
-// TODO: Is this necessary? Intel fixed this years ago.
-uint mul_hi977(uint x)
-{
-  uint high = x >> 16;
-  uint low = x & 0xffff;
-
-  return (((low * 977) >> 16) + (high * 977)) >> 16;
-}
 
 // 32 x 32 multiply-add
 void madd977(uint* high, uint* low, uint a, uint c)
 {
-  *low = a * 977;
-  uint tmp = *low + c;
-  uint carry = tmp < *low ? 1 : 0;
-  *low = tmp;
-  *high = mul_hi977(a) + carry;
+  ulong prod = (ulong)a * 977 + c;
+
+  *high = (uint)(prod >> 32);
+  *low = (uint)prod;
 }
 
-#else
-
-// 32 x 32 multiply-add
-void madd977(uint* high, uint* low, uint a, uint c)
-{
-  *low = a * 977;
-  uint tmp = *low + c;
-  uint carry = tmp < *low ? 1 : 0;
-  *low = tmp;
-  *high = mad_hi(a, (uint)977, carry);
-}
-
-#endif
 
 // 32 x 32 multiply-add
 void madd(uint* high, uint* low, uint a, uint b, uint c)
 {
-  *low = a * b;
-  uint tmp = *low + c;
-  uint carry = tmp < *low ? 1 : 0;
-  *low = tmp;
-  *high = mad_hi(a, b, carry);
+  ulong prod = (ulong)a * b + c;
+
+  *high = (uint)(prod >> 32);
+  *low = (uint)prod;
 }
 
 void mull(uint* high, uint* low, uint a, uint b)
