@@ -118,6 +118,10 @@ void gpulib::opencl::OpenCLDevice::collect_device_info()
   _mp_count = mp_count;
 
   cl_call(clGetDeviceInfo(_device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(_max_local_dim), _max_local_dim.data(), nullptr));
+
+  cl_ulong max_buffer_size;
+  cl_call(clGetDeviceInfo(_device, CL_DEVICE_MAX_MEM_ALLOC_SIZE, sizeof(max_buffer_size), &max_buffer_size, nullptr));
+  _max_buffer_size = max_buffer_size;
 }
 
 std::array<size_t, 3> gpulib::opencl::OpenCLDevice::get_max_local_dim()
@@ -128,4 +132,9 @@ std::array<size_t, 3> gpulib::opencl::OpenCLDevice::get_max_local_dim()
 size_t gpulib::opencl::OpenCLDevice::get_max_local_size()
 {
   return _max_local_size;
+}
+
+size_t gpulib::opencl::OpenCLDevice::max_buffer_size()
+{
+  return _max_buffer_size;
 }
