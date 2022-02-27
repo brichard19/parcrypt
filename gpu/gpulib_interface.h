@@ -133,6 +133,8 @@ public:
     virtual DeviceType get_type() = 0;
 
     virtual std::string get_unique_id() = 0;
+
+    virtual size_t max_buffer_size() = 0;
 };
 
 

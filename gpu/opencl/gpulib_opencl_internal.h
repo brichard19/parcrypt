@@ -114,6 +114,7 @@ private:
   cl_command_queue _queue;
 
   size_t _global_mem_size = 0;
+  size_t _max_buffer_size = 0;
   size_t _mp_count = 0;
   std::array<size_t, 3> _max_local_dim = { {1,1,1} };
   size_t _max_local_size = 1;
@@ -157,6 +158,8 @@ public:
   {
     return _id;
   }
+
+  size_t max_buffer_size();
 };
 
 }

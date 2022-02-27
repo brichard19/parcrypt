@@ -66,11 +66,19 @@ void BTCPubKeyHashGPU::init(secp256k1::uint256 key_start, secp256k1::uint256 key
   prepare_target_hash(_target_hash);
 
   // Calculate the number of points based on memory usage:
-  // X, Y and the chaining buffer
-  const size_t bytes_per_point = sizeof(secp256k1::uint256_t) * 3;
+  // X, Y and the chaining buffer. Use the mem_usage parameter and
+  // device limits to determine how much memory to allocate
+
+  size_t max_buffer_size = _device->max_buffer_size();
   size_t gpu_mem_size = _device->get_global_mem_size();
+  size_t max_points = max_buffer_size / sizeof(secp256k1::uint256_t);
+  size_t bytes_per_point = sizeof(secp256k1::uint256_t) * 3;
 
   _num_points = (uint32_t)(((double)gpu_mem_size * _mem_usage) / (double)bytes_per_point);
+
+  if(_num_points > max_points) {
+    _num_points = static_cast<uint32_t>(max_points);
+  }
 
   if(!_kernels_loaded) {
     setup_kernels();
