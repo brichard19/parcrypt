@@ -54,7 +54,7 @@ void print_uint256(uint256_t x)
 }
 
 // Add with carry
-uint addc(uint a, uint b, uint* carry)
+inline uint addc(uint a, uint b, uint* carry)
 {
   ulong sum = (ulong)a + b + *carry;
 
@@ -64,7 +64,7 @@ uint addc(uint a, uint b, uint* carry)
 }
 
 // Subtract with borrow
-uint subc(uint a, uint b, uint* borrow)
+inline uint subc(uint a, uint b, uint* borrow)
 {
   ulong diff = (ulong)a - b - *borrow;
 
@@ -75,7 +75,7 @@ uint subc(uint a, uint b, uint* borrow)
 
 
 // 32 x 32 multiply-add
-void madd977(uint* high, uint* low, uint a, uint c)
+inline void madd977(uint* high, uint* low, uint a, uint c)
 {
   ulong prod = (ulong)a * 977 + c;
 
@@ -85,7 +85,7 @@ void madd977(uint* high, uint* low, uint a, uint c)
 
 
 // 32 x 32 multiply-add
-void madd(uint* high, uint* low, uint a, uint b, uint c)
+inline void madd(uint* high, uint* low, uint a, uint b, uint c)
 {
   ulong prod = (ulong)a * b + c;
 
@@ -93,7 +93,7 @@ void madd(uint* high, uint* low, uint a, uint b, uint c)
   *low = (uint)prod;
 }
 
-void mull(uint* high, uint* low, uint a, uint b)
+inline void mull(uint* high, uint* low, uint a, uint b)
 {
   *low = a * b;
   *high = mul_hi(a, b);
@@ -116,24 +116,22 @@ uint256_t sub256(uint256_t a, uint256_t b, uint* borrow_ptr)
 
 bool gte_p(const uint a[8])
 {
-  // P = 2^256 - 2^32 - 977
-  if(a[7] != 0xffffffff) {
-    return false;
-  }
-
-  if(a[6] != 0xffffffff) {
-    return false;
-  }
-
-  for(int i = 7; i >= 0; i--) {
-    if(a[i] > _P_MINUS1[i]) {
-      return true;
-    } else if(a[i] < _P_MINUS1[i]) {
+  for (int i = 7; i >= 2; i--) {
+    if(a[i] != 0xffffffff) {
       return false;
     }
   }
 
+  if(a[1] < 0xfffffffe) {
+    return false;
+  }
+
+  if(a[0] < 0xFFFFFC2F) {
+    return false;
+  }
+
   return true;
+
 }
 
 void multiply128(const uint x[4], const uint y[4], uint z[8])
@@ -312,26 +310,27 @@ uint readWord256k(global const uint256_t* ara, int idx, int word)
   return ara[idx].v[word];
 }
 
-uint addP(const uint a[8], uint c[8])
+void addP(const uint a[8], uint c[8])
 {
   uint carry = 0;
 
   for(int i = 0; i < 8; i++) {
     c[i] = addc(a[i], _P[i], &carry);
   }
-
-  return carry;
 }
 
-uint subP(const uint a[8], uint c[8])
+void subP(const uint a[8], uint c[8])
 {
-  uint borrow = 0;
+  // Add two's compliment of P
+  uint t0 = ~0xFFFFFC2E + 1;
+  uint t1 = ~0xFFFFFFFE;
 
-  for(int i = 0; i < 8; i++) {
-    c[i] = subc(a[i], _P[i], &borrow);
+  uint carry = 0;
+  c[0] = addc(a[0], t0, &carry);
+  c[1] = addc(a[1], t1, &carry);
+  for(int i = 2; i < 8; i++) {
+    c[i] = addc(c[i], 0, &carry);
   }
-
-  return borrow;
 }
 
 /**
@@ -358,19 +357,10 @@ uint256_t addModP256(uint256_t a, uint256_t b)
   if(carry) {
     subP(c.v, c.v);
   } else if(c.v[0] == 0xffffffff) {
-    bool gt = false;
-    for(int i = 7; i >= 0; i--) {
-      if(c.v[i] > _P[i]) {
-        gt = true;
-        break;
-      } else if(c.v[i] < _P[i]) {
-        break;
-      }
-    }
-
-    if(gt) {
+    if(gte_p(c.v)) {
       subP(c.v, c.v);
-    }
+    } 
+
   }
 
   return c;
@@ -438,7 +428,10 @@ void squareModP(const uint a[8], uint product_low[8])
   product8 = carry;
 
   // Reduce if >= P
-  if(product8 || product_low[7] == 0xffffffff) {
+  if(product8) {
+    // rollover
+    subP(product_low, product_low);
+  } else if(product_low[7] == 0xffffffff) {
     if(gte_p(product_low)) {
       subP(product_low, product_low);
     }
@@ -507,11 +500,14 @@ void mulModP(const uint a[8], const uint b[8], uint product_low[8])
   product8 = carry;
 
   // Reduce if >= P
-  if(product8 || product_low[7] == 0xffffffff) {
+  if(carry) {
+    subP(product_low, product_low);
+  } else if(product_low[7] == 0xffffffff) {
     if(gte_p(product_low)) {
       subP(product_low, product_low);
     }
   }
+
 }
 
 uint256_t mulModP256(uint256_t a, uint256_t b)
