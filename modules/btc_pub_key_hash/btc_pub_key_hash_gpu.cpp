@@ -188,13 +188,13 @@ void BTCPubKeyHashGPU::tune_kernel(gpulib::Kernel kernel, const std::string& nam
 
   // Use grid sizes between 1 and 16 blocks per multi-processor
   std::vector<std::array<size_t, 3>> grid_sizes;
-  for(size_t i = 1; i <= 16; i *= 2) {
+  for(size_t i = 1; i <= 8; i *= 2) {
     grid_sizes.push_back({ gpu_mp_count * i, 1, 1 });
   }
 
   // Use block sizes between 32 and 256 threads
   std::vector<std::array<size_t, 3>> block_sizes;
-  for(size_t i = 32; i <= 256; i += 32) {
+  for(size_t i = 32; i <= 256; i *= 2) {
     block_sizes.push_back({ i, 1, 1 });
   }
 
