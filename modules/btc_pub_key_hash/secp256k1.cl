@@ -10,36 +10,39 @@ typedef struct {
 /**
  Prime modulus 2^256 - 2^32 - 977
  */
+/*
 constant uint _P[8] = {
   0xFFFFFC2F, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 };
+*/
 
-constant uint _P_MINUS1[8] = {
-  0xFFFFFC2E, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
-};
 
 /**
  Base point X
  */
+/*
 constant uint _GX[8] = {
   0x16F81798, 0x59F2815B, 0x2DCE28D9, 0x029BFCDB, 0xCE870B07, 0x55A06295, 0xF9DCBBAC, 0x79BE667E
 };
+*/
 
 /**
  Base point Y
  */
+/*
 constant uint _GY[8] = {
   0xFB10D4B8, 0x9C47D08F, 0xA6855419, 0xFD17B448, 0x0E1108A8, 0x5DA4FBFC, 0x26A3C465, 0x483ADA77
 };
-
+*/
 
 /**
  * Group order
  */
+/*
 constant uint _N[8] = {
   0xD0364141, 0xBFD25E8C, 0xAF48A03B, 0xBAAEDCE6, 0xFFFFFFFE, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF
 };
-
+*/
 
 void print_big_int(const uint x[8])
 {
@@ -99,6 +102,35 @@ inline void mull(uint* high, uint* low, uint a, uint b)
   *high = mul_hi(a, b);
 }
 
+inline void addP(const uint a[8], uint c[8])
+{
+  uint carry = 0;
+  c[0] = addc(a[0], 0xFFFFFC2F, &carry);
+  c[1] = addc(a[1], 0xFFFFFFFE, &carry);
+  c[2] = addc(a[2], 0xFFFFFFFF, &carry);
+  c[3] = addc(a[3], 0xFFFFFFFF, &carry);
+  c[4] = addc(a[4], 0xFFFFFFFF, &carry);
+  c[5] = addc(a[5], 0xFFFFFFFF, &carry);
+  c[6] = addc(a[6], 0xFFFFFFFF, &carry);
+  c[7] = a[7] + 0xFFFFFFFF + carry;
+}
+
+inline void subP(const uint a[8], uint c[8])
+{
+  // Add two's compliment of P
+  const uint t0 = ~0xFFFFFC2E + 1;
+  const uint t1 = ~0xFFFFFFFE;
+
+  uint carry = 0;
+  c[0] = addc(a[0], t0, &carry);
+  c[1] = addc(a[1], t1, &carry);
+  c[2] = addc(a[2], t1, &carry);
+  c[3] = addc(a[3], t1, &carry);
+  c[4] = addc(a[4], t1, &carry);
+  c[5] = addc(a[5], t1, &carry);
+  c[6] = addc(a[6], t1, &carry);
+  c[7] = a[7] + carry;
+}
 
 uint256_t sub256(uint256_t a, uint256_t b, uint* borrow_ptr)
 {
@@ -310,28 +342,7 @@ uint readWord256k(global const uint256_t* ara, int idx, int word)
   return ara[idx].v[word];
 }
 
-void addP(const uint a[8], uint c[8])
-{
-  uint carry = 0;
 
-  for(int i = 0; i < 8; i++) {
-    c[i] = addc(a[i], _P[i], &carry);
-  }
-}
-
-void subP(const uint a[8], uint c[8])
-{
-  // Add two's compliment of P
-  uint t0 = ~0xFFFFFC2E + 1;
-  uint t1 = ~0xFFFFFFFE;
-
-  uint carry = 0;
-  c[0] = addc(a[0], t0, &carry);
-  c[1] = addc(a[1], t1, &carry);
-  for(int i = 2; i < 8; i++) {
-    c[i] = addc(c[i], 0, &carry);
-  }
-}
 
 /**
  * Subtraction mod p
