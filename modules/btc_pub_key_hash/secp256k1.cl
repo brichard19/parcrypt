@@ -171,6 +171,7 @@ void multiply128(const uint x[4], const uint y[4], uint z[8])
   uint high = 0;
 
   // First round, overwrite z
+  #pragma unroll
   for(int j = 0; j < 4; j++) {
     uint64_t product = (uint64_t)x[0] * y[j];
 
@@ -181,6 +182,7 @@ void multiply128(const uint x[4], const uint y[4], uint z[8])
   }
   z[4] = high;
 
+  #pragma unroll
   for(int i = 1; i < 4; i++) {
 
     high = 0;
@@ -207,6 +209,7 @@ void multiply256(const uint x[8], const uint y[8], uint out_high[8], uint out_lo
   uint high = 0;
 
   // First round, overwrite z
+  #pragma unroll
   for(int j = 0; j < 8; j++) {
 
     uint64_t product = (uint64_t)x[0] * y[j];
@@ -218,6 +221,7 @@ void multiply256(const uint x[8], const uint y[8], uint out_high[8], uint out_lo
   }
   z[8] = high;
 
+  #pragma unroll
   for(int i = 1; i < 8; i++) {
 
     high = 0;
@@ -387,60 +391,79 @@ void squareModP(const uint a[8], uint product_low[8])
   // 256 x 256 multiply
   square256(a, high, product_low);
 
-  // Add 2^32 * high to the low 256 bits (shift left 1 word and add)
-  for(int i = 1; i < 8; i++) {
-    product_low[i] = addc(product_low[i], high[i - 1], &carry);
-  }
-  uint product8 = addc(high[7], 0, &carry);
-  uint product9 = carry;
+  // Perform reduction by multiplying the high 256 bits by 2^32 + 977 and
+  // adding it to the low 256 bits 
+  ulong product = (ulong)high[0] * 977 + product_low[0];
+  hWord = (uint)(product >> 32);
+  product_low[0] = (uint)product;
 
-  carry = 0;
+  product = (ulong)high[1] * 977 + high[0] + product_low[1] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[1] = (uint)product;
 
-  // Multiply high by 977 and add to low
-  for(int i = 0; i < 8; i++) {
-    uint t = 0;
-    madd977(&hWord, &t, high[i], hWord);
-    product_low[i] = addc(product_low[i], t, &carry);
-  }
-  product8 = addc(product8, hWord, &carry);
-  product9 = addc(product9, 0, &carry);
+  product = (ulong)high[2] * 977 + high[1] + product_low[2] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[2] = (uint)product;
+  
+  product = (ulong)high[3] * 977 + high[2] + product_low[3] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[3] = (uint)product;
+  
+  product = (ulong)high[4] * 977 + high[3] + product_low[4] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[4] = (uint)product;
+  
+  product = (ulong)high[5] * 977 + high[4] + product_low[5] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[5] = (uint)product;
+  
+  product = (ulong)high[6] * 977 + high[5] + product_low[6] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[6] = (uint)product;
+  
+  product = (ulong)high[7] * 977 + high[6] + product_low[7] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[7] = (uint)product;
 
-  // Multiply high 2 words by 2^32 and add to low
-  carry = 0;
-  high[0] = product8;
-  high[1] = product9;
+  // Second reduction
+  ulong sum = (ulong)high[7] + hWord;
+  high[0] = (uint)sum;
+  high[1] = (uint)(sum >> 32); 
 
-  product8 = 0;
-  product9 = 0;
+  product = (ulong)high[0] * 977 + product_low[0];
+  hWord = (uint)(product >> 32);
+  product_low[0] = (uint)product;
 
-  product_low[1] = addc(product_low[1], high[0], &carry);
-  product_low[2] = addc(product_low[2], high[1], &carry);
+  product = (ulong)high[1] * 977 + high[0] + product_low[1] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[1] = (uint)product;
 
-  // Propagate the carry
-  for(int i = 3; i < 8; i++) {
-    product_low[i] = addc(product_low[i], 0, &carry);
-  }
-  product8 = carry;
+  sum = (ulong)high[1] + product_low[2] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[2] = (uint)sum;
 
-  // Multiply top 2 words by 977 and add to low
-  carry = 0;
-  hWord = 0;
-  uint t = 0;
-  madd977(&hWord, &t, high[0], hWord);
-  product_low[0] = addc(product_low[0], t, &carry);
-  madd977(&hWord, &t, high[1], hWord);
-  product_low[1] = addc(product_low[1], t, &carry);
-  product_low[2] = addc(product_low[2], hWord, &carry);
+  sum = (ulong)product_low[3] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[3] = (uint)sum;
+  
+  sum = (ulong)product_low[4] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[4] = (uint)sum;
+  
+  sum = (ulong)product_low[5] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[5] = (uint)sum;
 
-  // Propagate carry
-  for(int i = 3; i < 8; i++) {
-    product_low[i] = addc(product_low[i], 0, &carry);
-  }
-  product8 = carry;
+  sum = (ulong)product_low[6] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[6] = (uint)sum;
+  
+  sum = (ulong)product_low[7] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[7] = (uint)sum;
 
   // Reduce if >= P
-  if(product8) {
-    // rollover
+  if(hWord) {
     subP(product_low, product_low);
   } else if(product_low[7] == 0xffffffff) {
     if(gte_p(product_low)) {
@@ -459,59 +482,79 @@ void mulModP(const uint a[8], const uint b[8], uint product_low[8])
   // 256 x 256 multiply
   multiply256(a, b, high, product_low);
 
-  // Add 2^32 * high to the low 256 bits (shift left 1 word and add)
-  for(int i = 1; i < 8; i++) {
-    product_low[i] = addc(product_low[i], high[i - 1], &carry);
-  }
-  uint product8 = addc(high[7], 0, &carry);
-  uint product9 = carry;
+  // Perform reduction by multiplying the high 256 bits by 2^32 + 977 and
+  // adding it to the low 256 bits 
+  ulong product = (ulong)high[0] * 977 + product_low[0];
+  hWord = (uint)(product >> 32);
+  product_low[0] = (uint)product;
 
-  carry = 0;
+  product = (ulong)high[1] * 977 + high[0] + product_low[1] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[1] = (uint)product;
 
-  // Multiply high by 977 and add to low
-  for(int i = 0; i < 8; i++) {
-    uint t = 0;
-    madd977(&hWord, &t, high[i], hWord);
-    product_low[i] = addc(product_low[i], t, &carry);
-  }
-  product8 = addc(product8, hWord, &carry);
-  product9 = addc(product9, 0, &carry);
+  product = (ulong)high[2] * 977 + high[1] + product_low[2] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[2] = (uint)product;
+  
+  product = (ulong)high[3] * 977 + high[2] + product_low[3] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[3] = (uint)product;
+  
+  product = (ulong)high[4] * 977 + high[3] + product_low[4] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[4] = (uint)product;
+  
+  product = (ulong)high[5] * 977 + high[4] + product_low[5] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[5] = (uint)product;
+  
+  product = (ulong)high[6] * 977 + high[5] + product_low[6] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[6] = (uint)product;
+  
+  product = (ulong)high[7] * 977 + high[6] + product_low[7] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[7] = (uint)product;
 
-  // Multiply high 2 words by 2^32 and add to low
-  carry = 0;
-  high[0] = product8;
-  high[1] = product9;
+  // Second reduction
+  ulong sum = (ulong)high[7] + hWord;
+  high[0] = (uint)sum;
+  high[1] = (uint)(sum >> 32); 
 
-  product8 = 0;
-  product9 = 0;
+  product = (ulong)high[0] * 977 + product_low[0];
+  hWord = (uint)(product >> 32);
+  product_low[0] = (uint)product;
 
-  product_low[1] = addc(product_low[1], high[0], &carry);
-  product_low[2] = addc(product_low[2], high[1], &carry);
+  product = (ulong)high[1] * 977 + high[0] + product_low[1] + hWord;
+  hWord = (uint)(product >> 32);
+  product_low[1] = (uint)product;
 
-  // Propagate the carry
-  for(int i = 3; i < 8; i++) {
-    product_low[i] = addc(product_low[i], 0, &carry);
-  }
-  product8 = carry;
+  sum = (ulong)high[1] + product_low[2] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[2] = (uint)sum;
 
-  // Multiply top 2 words by 977 and add to low
-  carry = 0;
-  hWord = 0;
-  uint t = 0;
-  madd977(&hWord, &t, high[0], hWord);
-  product_low[0] = addc(product_low[0], t, &carry);
-  madd977(&hWord, &t, high[1], hWord);
-  product_low[1] = addc(product_low[1], t, &carry);
-  product_low[2] = addc(product_low[2], hWord, &carry);
+  sum = (ulong)product_low[3] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[3] = (uint)sum;
+  
+  sum = (ulong)product_low[4] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[4] = (uint)sum;
+  
+  sum = (ulong)product_low[5] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[5] = (uint)sum;
 
-  // Propagate carry
-  for(int i = 3; i < 8; i++) {
-    product_low[i] = addc(product_low[i], 0, &carry);
-  }
-  product8 = carry;
+  sum = (ulong)product_low[6] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[6] = (uint)sum;
+  
+  sum = (ulong)product_low[7] + hWord;
+  hWord = (uint)(sum >> 32);
+  product_low[7] = (uint)sum;
 
   // Reduce if >= P
-  if(carry) {
+  if(hWord) {
     subP(product_low, product_low);
   } else if(product_low[7] == 0xffffffff) {
     if(gte_p(product_low)) {
