@@ -782,7 +782,7 @@ void complete_batch_add_with_double(
 
     // s^2
     uint256_t s2;
-    s2 = mulModP256(s, s);
+    s2 = squareModP256k(s);
 
     // Rx = s^2 - 2px
     *newX = subModP256(s2, x);
@@ -852,7 +852,7 @@ void complete_batch_add(
 
   // Rx = s^2 - Gx - Qx
   uint256_t s2;
-  s2 = mulModP256(s, s);
+  s2 = squareModP256k(s);
 
   *newX = subModP256(s2, px);
   *newX = subModP256(*newX, x);
