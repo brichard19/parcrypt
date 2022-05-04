@@ -87,8 +87,8 @@ The client configuration is in client.json. It contains the hostname of the serv
   "hostname": "127.0.0.1",
   "port": 8080,
   "gpu_devices":[
-    {"opencl":0, "mem_usage":0.85},
-    {"opencl":1, "mem_usage":0.85}
+    {"opencl":0, "mem_usage":"85%"},
+    {"opencl":1, "mem_usage":"2GB"}
   ]
 }
 ```
