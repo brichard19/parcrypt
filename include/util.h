@@ -25,7 +25,7 @@ std::string to_hex(uint64_t);
 std::string to_hex(char);
 std::string to_hex(const uint8_t *ptr, size_t count);
 std::string to_hex(const std::string& s);
-
+std::string to_lower(const std::string& s);
 std::string pad_string(const std::string& s, int len);
 
 float parse_float(const std::string& s);
@@ -50,6 +50,10 @@ public:
     void stop();
     double elapsed();
 };
+
+bool parse_percent(const std::string& s, double* value);
+
+bool parse_bytes(const std::string& s, double* value);
 
 };
 

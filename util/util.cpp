@@ -245,6 +245,16 @@ std::string to_hex(const std::string& s)
   return to_hex((const uint8_t*)s.c_str(), s.length());
 }
 
+std::string to_lower(const std::string& s)
+{
+  std::string s2;
+  for(auto& c : s) {
+    s2 += tolower(c);
+  }
+
+  return s2;
+}
+
 float parse_float(const std::string& s)
 {
   float value = 0.0f;
@@ -268,6 +278,67 @@ std::string pad_string(const std::string& s, int len)
 uint32_t endian(uint32_t x)
 {
   return (x << 24) | ((x << 8) & 0x00ff0000) | ((x >> 8) & 0x0000ff00) | (x >> 24);
+}
+
+bool parse_bytes(const std::string& s, double* value)
+{
+  char units[] = { 'k', 'm', 'g' };
+
+  std::string line = to_lower(s);
+
+  size_t idx = -1;
+
+  for(auto& u : units) {
+    if((idx = line.find(u)) != std::string::npos) {
+      break;
+    }
+  }
+
+  if(idx == std::string::npos) {
+    return false;
+  }
+
+  std::string str = line.substr(0, idx);
+
+  double tmp = 0.0;
+  if(sscanf(str.c_str(), "%lf", &tmp) != 1) {
+    return false;
+  }
+
+  switch(line[idx]) {
+  case 'k':
+    tmp = tmp * 1024.0;
+    break;
+  case 'm':
+    tmp = tmp * 1024.0 * 1024.0;
+    break;
+  case 'g':
+    tmp = tmp * 1024.0 * 1024.0 * 1024.0;
+    break;
+  default:
+    return false;
+  }
+
+  *value = tmp;
+
+  return true;
+}
+
+bool parse_percent(const std::string& s, double* value)
+{
+  size_t idx = s.find('%');
+
+  if(idx == std::string::npos) {
+    return false;
+  }
+
+  std::string sub = s.substr(0, idx);
+
+  if(sscanf(sub.c_str(), "%lf", value) != 1) {
+    return false;
+  }
+
+  return true;
 }
 
 }

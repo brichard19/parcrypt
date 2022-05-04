@@ -19,12 +19,28 @@ BTCPubKeyHashGPU::~BTCPubKeyHashGPU()
 {
 }
 
-void BTCPubKeyHashGPU::set_mem_usage(float usage)
+void BTCPubKeyHashGPU::set_mem_usage(const MemUsage& usage)
+{
+  if(usage.type == MemUsage::MemUsageType::Percent) {
+    set_mem_usage_pct(usage.usage);
+  } else {
+    set_mem_usage_bytes(static_cast<size_t>(usage.usage));
+  }
+}
+
+void BTCPubKeyHashGPU::set_mem_usage_pct(double usage)
 {
   if(usage <= 0.0f || usage > 1.0f) {
     throw std::invalid_argument("Invalid value for mem usage");
   }
 
+  size_t gpu_mem_size = _device->get_global_mem_size();
+
+  set_mem_usage_bytes(static_cast<size_t>(gpu_mem_size * usage));
+}
+
+void BTCPubKeyHashGPU::set_mem_usage_bytes(size_t usage)
+{
   _mem_usage = usage;
 }
 
@@ -70,11 +86,10 @@ void BTCPubKeyHashGPU::init(secp256k1::uint256 key_start, secp256k1::uint256 key
   // device limits to determine how much memory to allocate
 
   size_t max_buffer_size = _device->max_buffer_size();
-  size_t gpu_mem_size = _device->get_global_mem_size();
   size_t max_points = max_buffer_size / sizeof(secp256k1::uint256_t);
   size_t bytes_per_point = sizeof(secp256k1::uint256_t) * 3;
 
-  _num_points = (uint32_t)(((double)gpu_mem_size * _mem_usage) / (double)bytes_per_point);
+  _num_points = (uint32_t)(((double)_mem_usage) / (double)bytes_per_point);
 
   if(_num_points > max_points) {
     _num_points = static_cast<uint32_t>(max_points);

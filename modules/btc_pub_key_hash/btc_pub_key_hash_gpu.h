@@ -5,6 +5,7 @@
 #include <deque>
 
 #include "gpulib.h"
+#include "gpu_config.h"
 #include "secp256k1.h"
 #include "settings_cache.h"
 #include "util.h"
@@ -42,7 +43,8 @@ private:
   gpulib::DeviceMemory _dev_result_flag;
   gpulib::DeviceMemory _dev_result_idx;
  
-  float _mem_usage = 0.1f;
+
+  size_t _mem_usage = 128 * 1024 * 1024;
   std::string _target;
   int32_t _num_points = 0;
   uint32_t _target_hash[5] = { 0 };
@@ -88,11 +90,15 @@ private:
 
   std::deque<double> _timings;
 
+  void set_mem_usage_pct(double usage);
+
+  void set_mem_usage_bytes(size_t usage);
+
 public:
   BTCPubKeyHashGPU(gpulib::Device& device);
   virtual ~BTCPubKeyHashGPU();
 
-  void set_mem_usage(float usage);
+  void set_mem_usage(const MemUsage& usage);
 
   void init(secp256k1::uint256 key_start, secp256k1::uint256 key_end, const std::string& target, bool compressed = true);
 

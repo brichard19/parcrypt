@@ -3,6 +3,7 @@
 #include "json11.hpp"
 #include "logger.h"
 #include "platform.h"
+#include "util.h"
 
 Config load_config(const std::string& path)
 {
@@ -69,10 +70,20 @@ Config load_config(const std::string& path)
       continue;
     }
 
+    // Parse memory usage as a percent or number of bytes
     if(items.find("mem_usage") != items.end()) {
-      gpu_config.mem_usage = (float)items["mem_usage"].number_value();
-    }
+      double value = 0.0f;
+      std::string s = items["mem_usage"].string_value();
 
+      if(util::parse_bytes(s, &value)) {
+        gpu_config.mem_usage = MemUsage(MemUsage::MemUsageType::Bytes, value);
+      } else if(util::parse_percent(s, &value)) {
+        gpu_config.mem_usage = MemUsage(MemUsage::MemUsageType::Percent, value / 100.0);
+      } else {
+        LOG(LogLevel::Error) << "mem_usage must be a percentage or size e.g. \"85%\" or \"4GB\"";
+        throw std::runtime_error("mem_usage");
+      }
+    }
 
     config.gpu_devices.push_back(gpu_config);
   }
