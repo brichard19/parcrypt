@@ -166,7 +166,7 @@ void worker_thread(WorkerSlot* d, parcrypt::IWorkItem* work_item_ptr)
   add_thread(state);
 
   try {
-    LOG(LogLevel::Info) << d->gpu.device_info.device_name << " starting " << work_item_ptr->parent()->id();
+    LOG(LogLevel::Info) << d->gpu.device_info.device_name << " starting " << work_item_ptr->parent()->friendly_id();
     f[type](state, work_item_ptr);
   } catch(gpulib::Exception& e) {
     work_item_ptr->set_status(parcrypt::IWorkItem::Status::Aborted);
@@ -336,7 +336,7 @@ void status_thread_function()
           continue;
         }
         std::string name = state->work_item()->parent()->name();
-        std::string id = state->work_item()->parent()->id();
+        std::string id = state->work_item()->parent()->friendly_id();
         std::string key = name + "-" + id;
         if(work_status.find(key) != work_status.end()) {
           work_status[key].states.push_back(state);

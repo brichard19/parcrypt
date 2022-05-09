@@ -81,6 +81,8 @@ public:
 
   virtual std::string id() = 0;
 
+  virtual std::string friendly_id() = 0;
+
   virtual void create(const WorkData& work_data) = 0;
 
   virtual void save(const std::string& path) = 0;

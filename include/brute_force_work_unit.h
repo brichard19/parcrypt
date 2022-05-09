@@ -58,6 +58,8 @@ public:
 
   std::string id();
 
+  std::string friendly_id();
+
   IWorkItem* get_work();
 
   int available_work();

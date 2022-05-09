@@ -28,6 +28,11 @@ std::string BruteForceWorkUnit::id()
   return _id;
 }
 
+std::string BruteForceWorkUnit::friendly_id()
+{
+  return _id.substr(0, 8);
+}
+
 void BruteForceWorkUnit::init()
 {
   secp256k1::uint256 key = _start;

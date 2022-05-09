@@ -51,7 +51,7 @@ Config load_config(const std::string& path)
       gpu_config.api = (int)gpulib::DeviceType::OpenCL;
     } else if(items.find("cuda") != items.end()) {
       gpu_config.device_id = items["cuda"].int_value();
-      gpu_config.api = (int)(int)gpulib::DeviceType::CUDA;
+      gpu_config.api = (int)gpulib::DeviceType::CUDA;
     } else {
       throw std::runtime_error("expected 'opencl' or 'cuda'");
     }
