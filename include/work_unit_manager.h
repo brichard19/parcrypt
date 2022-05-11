@@ -16,8 +16,12 @@ class WorkUnitManager {
 private:
   std::mutex _mutex;
 
-  const std::string _work_dir = "work_units";
-  const std::string _completed_dir = "completed_work";
+  const std::string WORK_DIR_NAME = "work_units";
+  const std::string COMPLETED_DIR_NAME = "completed_work";
+
+  std::string _work_dir;
+  std::string _completed_dir;
+  std::string _data_dir;
 
   std::map<std::string, IWorkUnit*> _work_units;
 
@@ -25,7 +29,7 @@ private:
 
 public:
 
-  WorkUnitManager();
+  WorkUnitManager(const std::string& data_dir = "");
   
   ~WorkUnitManager();
 

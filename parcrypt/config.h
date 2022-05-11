@@ -16,6 +16,7 @@ public:
   std::string username;
   std::string password;
   std::string auth_token;
+  std::string data_dir;
 
   // Authentication object
   ClientAuth auth;

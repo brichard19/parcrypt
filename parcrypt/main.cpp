@@ -26,7 +26,7 @@ bool _running = true;
 std::vector<WorkerThreadState*> _thread_states;
 std::mutex _thread_state_mutex;
 
-parcrypt::WorkUnitManager _manager;
+parcrypt::WorkUnitManager* _manager = nullptr;
 
 Config _config;
 
@@ -79,19 +79,19 @@ void remove_thread(WorkerThreadState* t)
 
 bool have_enough_work()
 {
-  return _manager.total_work_available() >= _worker_slots.size();
+  return _manager->total_work_available() >= _worker_slots.size();
 }
 
 
 parcrypt::IWorkItem* get_work()
 {
-  return _manager.get_work();
+  return _manager->get_work();
 }
 
 
 void return_work(parcrypt::IWorkItem* work_item)
 {
-  _manager.report_work(work_item);
+  _manager->report_work(work_item);
 }
 
 
@@ -129,7 +129,7 @@ bool get_work_from_server()
     parcrypt::IWorkUnit* work_unit = factory[type]();
     work_unit->create(work_data);
 
-    _manager.add(work_unit);
+    _manager->add(work_unit);
 
     return true;
   }
@@ -262,7 +262,7 @@ void upload_thread_function()
   try {
     while(_running) {
 
-      std::vector<parcrypt::CompletedWorkData> completed_work = _manager.get_completed_work();
+      std::vector<parcrypt::CompletedWorkData> completed_work = _manager->get_completed_work();
 
       for(auto& w : completed_work) {
 
@@ -273,7 +273,7 @@ void upload_thread_function()
 
           client.report_results(w);
 
-          _manager.remove(w.id);
+          _manager->remove(w.id);
         } catch(std::exception& ex) {
           LOG(LogLevel::Info) << "Error connecting to server: " << ex.what();
         }
@@ -471,6 +471,8 @@ int main(int argc, char** argv)
     return 1;
   }
 
+  _manager = new parcrypt::WorkUnitManager(_config.data_dir);
+
   std::vector<gpulib::DeviceInfo> available_gpus = gpulib::get_devices();
 
   if(available_gpus.size() == 0) {
@@ -498,6 +500,7 @@ int main(int argc, char** argv)
 
   run();
 
+  delete _manager;
 
   return 0;
 }

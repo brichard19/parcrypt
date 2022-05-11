@@ -30,6 +30,10 @@ std::string make_path_internal(const std::vector<std::string>& elements)
   for(int i = 0; i < elements.size() - 1; i++) {
     std::string e = elements[i];
 
+    if(e.empty()) {
+      continue;
+    }
+
     if(e.at(e.length() - 1) != '/') {
       e += "/";
     }

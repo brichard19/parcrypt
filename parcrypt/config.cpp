@@ -5,6 +5,23 @@
 #include "platform.h"
 #include "util.h"
 
+namespace {
+
+std::string sanitize_json(const std::string& json)
+{
+  // Replace single backslash with double backslash
+  size_t idx = 0;
+  std::string s = json;
+  while((idx = s.find("\\", idx)) != std::string::npos) {
+    s.insert(idx, "\\");
+    idx += 2;
+  }
+
+  return s;
+}
+
+}
+
 Config load_config(const std::string& path)
 {
   Config config;
@@ -23,8 +40,9 @@ Config load_config(const std::string& path)
 
   std::stringstream buffer;
   buffer << f.rdbuf();
+  std::string str = sanitize_json(buffer.str());
   std::string err;
-  const auto json = json11::Json::parse(buffer.str(), err);
+  const auto json = json11::Json::parse(str, err);
 
   config.hostname = json["hostname"].string_value();
   config.port = json["port"].int_value();
@@ -42,6 +60,10 @@ Config load_config(const std::string& path)
   //for(auto i : json["projects"].array_items()) {
   //  config.projects.push_back(i.string_value());
   //}
+
+  if(json.object_items().count("data_dir")) {
+    config.data_dir = json["data_dir"].string_value();
+  }
 
   for(auto i : json["gpu_devices"].array_items()) {
     GPUConfig gpu_config;

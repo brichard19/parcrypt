@@ -7,9 +7,13 @@
 namespace parcrypt {
 
 
-WorkUnitManager::WorkUnitManager()
+WorkUnitManager::WorkUnitManager(const std::string& data_dir)
+: _data_dir(data_dir)
 {
-  // Create directories
+  _work_dir = platform::make_path(_data_dir, WORK_DIR_NAME);
+  _completed_dir = platform::make_path(_data_dir, COMPLETED_DIR_NAME);
+
+    // Create directories
   platform::create_directories(_work_dir);
   platform::create_directories(_completed_dir);
 
