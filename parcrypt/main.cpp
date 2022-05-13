@@ -462,10 +462,24 @@ void console_handler(int signal)
 
 int main(int argc, char** argv)
 {
+  std::string config_file = "config.json";
+
+  // Currently the only argument accepted is --config
+  if(argc > 1) {
+    if(argc == 3 && strcmp(argv[1], "--config") == 0) {
+      config_file = argv[2];
+    } else {
+      std::cout << "Usage:" << std::endl;
+      std::cout << "--config FILE" << std::endl;
+      std::cout << "    Read configuration from FILE" << std::endl;
+      return 1;
+    }
+  }
+
   std::vector<gpulib::DeviceInfo> selected_devices;
 
   try {
-    _config = load_config("config.json");
+    _config = load_config(config_file);
   } catch(std::exception& e) {
     std::cout << "Configuration error: " << e.what() << std::endl;
     return 1;
