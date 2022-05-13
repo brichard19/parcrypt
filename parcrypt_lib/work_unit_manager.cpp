@@ -13,7 +13,11 @@ WorkUnitManager::WorkUnitManager(const std::string& data_dir)
   _work_dir = platform::make_path(_data_dir, WORK_DIR_NAME);
   _completed_dir = platform::make_path(_data_dir, COMPLETED_DIR_NAME);
 
-    // Create directories
+  if(!platform::exists(data_dir)) {
+    platform::create_directories(data_dir);
+  }
+
+  // Create directories
   platform::create_directories(_work_dir);
   platform::create_directories(_completed_dir);
 

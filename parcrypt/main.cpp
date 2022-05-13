@@ -471,7 +471,12 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  _manager = new parcrypt::WorkUnitManager(_config.data_dir);
+  try {
+    _manager = new parcrypt::WorkUnitManager(_config.data_dir);
+  } catch(std::exception& ex) {
+    std::cout << ex.what() << std::endl;
+    return 1;
+  }
 
   std::vector<gpulib::DeviceInfo> available_gpus = gpulib::get_devices();
 
