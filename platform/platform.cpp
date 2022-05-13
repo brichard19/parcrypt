@@ -25,6 +25,11 @@ namespace platform {
 
 std::string make_path_internal(const std::vector<std::string>& elements)
 {
+#ifdef _WIN32
+  const char separator = '\\';
+#else
+  const char separator = '/';
+#endif
   std::string path = "";
 
   for(int i = 0; i < elements.size() - 1; i++) {
@@ -34,8 +39,8 @@ std::string make_path_internal(const std::vector<std::string>& elements)
       continue;
     }
 
-    if(e.at(e.length() - 1) != '/') {
-      e += "/";
+    if(e.at(e.length() - 1) != separator) {
+      e += separator;
     }
 
     path += e;
