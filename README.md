@@ -80,12 +80,19 @@ Currently there is no way to see the progress except by looking at the database 
 
 ### Configure the client
 
-The client configuration is in client.json. It contains the hostname of the server, the port to connect on, and the list of GPUs to use and the max amount of GPU memory to use:
+The client configuration is stored in `client.json`. parcrypt looks for it in the current directory.
 
+`hostname`: The parcrypt server address.
+`port`: The port to connect on.
+`data_dir`: Directory where parcrypt will store data. Can be an absolute or relative path.
+`gpu_devices`: An array specifying which GPU devices to use (see example configuration below).
+
+Example configuration:
 ```
 {
   "hostname": "127.0.0.1",
   "port": 8080,
+  "data_dir":"C:\parcrypt",
   "gpu_devices":[
     {"opencl":0, "mem_usage":"85%"},
     {"opencl":1, "mem_usage":"2GB"}
