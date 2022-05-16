@@ -54,6 +54,10 @@ void BTCPubKeyHashGPU::init(secp256k1::uint256 key_start, secp256k1::uint256 key
     throw std::invalid_argument("Uncompressed keys not supported");
   }
 
+  if(key_start < 1) {
+    throw std::invalid_argument("Start key must be at least 1");
+  }
+
   if(key_start > key_end) {
     throw std::invalid_argument("Start key is higher than end key");
   }
