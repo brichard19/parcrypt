@@ -31,7 +31,7 @@ constant uint _IV[8] = {
 
 #define s1(x) (rotr((x), 17) ^ rotr((x), 19) ^ ((x) >> 10))
 
-#define round(a, b, c, d, e, f, g, h, m, k)\
+#define s256rnd(a, b, c, d, e, f, g, h, m, k)\
     t = CH((e), (f), (g)) + (rotr((e), 6) ^ rotr((e), 11) ^ rotr((e), 25)) + (k) + (m);\
     (d) += (t) + (h);\
     (h) += (t) + MAJ((a), (b), (c)) + (rotr((a), 2) ^ rotr((a), 13) ^ rotr((a), 22))
@@ -70,22 +70,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   g = _IV[6];
   h = _IV[7];
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[0]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[1]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[2]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[3]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[4]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[5]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[6]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[7]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[8]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[9]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[10]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[11]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[12]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[13]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[14]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[15]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[0]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[1]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[2]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[3]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[4]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[5]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[6]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[7]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[8]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[9]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[10]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[11]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[12]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[13]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[14]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[15]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -104,22 +104,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[16]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[17]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[18]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[19]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[20]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[21]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[22]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[23]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[24]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[25]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[26]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[27]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[28]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[29]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[30]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[31]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[16]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[17]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[18]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[19]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[20]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[21]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[22]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[23]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[24]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[25]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[26]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[27]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[28]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[29]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[30]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[31]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -138,22 +138,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[32]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[33]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[34]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[35]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[36]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[37]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[38]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[39]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[40]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[41]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[42]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[43]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[44]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[45]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[46]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[47]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[32]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[33]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[34]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[35]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[36]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[37]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[38]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[39]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[40]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[41]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[42]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[43]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[44]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[45]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[46]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[47]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -172,22 +172,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[48]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[49]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[50]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[51]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[52]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[53]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[54]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[55]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[56]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[57]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[58]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[59]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[60]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[61]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[62]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[63]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[48]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[49]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[50]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[51]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[52]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[53]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[54]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[55]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[56]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[57]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[58]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[59]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[60]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[61]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[62]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[63]);
 
   a += _IV[0];
   b += _IV[1];
@@ -212,22 +212,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[0] = (y[0] << 24) | 0x00800000;
   w[15] = 65 * 8;
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[0]);
-  round(h, a, b, c, d, e, f, g, 0, _K[1]);
-  round(g, h, a, b, c, d, e, f, 0, _K[2]);
-  round(f, g, h, a, b, c, d, e, 0, _K[3]);
-  round(e, f, g, h, a, b, c, d, 0, _K[4]);
-  round(d, e, f, g, h, a, b, c, 0, _K[5]);
-  round(c, d, e, f, g, h, a, b, 0, _K[6]);
-  round(b, c, d, e, f, g, h, a, 0, _K[7]);
-  round(a, b, c, d, e, f, g, h, 0, _K[8]);
-  round(h, a, b, c, d, e, f, g, 0, _K[9]);
-  round(g, h, a, b, c, d, e, f, 0, _K[10]);
-  round(f, g, h, a, b, c, d, e, 0, _K[11]);
-  round(e, f, g, h, a, b, c, d, 0, _K[12]);
-  round(d, e, f, g, h, a, b, c, 0, _K[13]);
-  round(c, d, e, f, g, h, a, b, 0, _K[14]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[15]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[0]);
+  s256rnd(h, a, b, c, d, e, f, g, 0, _K[1]);
+  s256rnd(g, h, a, b, c, d, e, f, 0, _K[2]);
+  s256rnd(f, g, h, a, b, c, d, e, 0, _K[3]);
+  s256rnd(e, f, g, h, a, b, c, d, 0, _K[4]);
+  s256rnd(d, e, f, g, h, a, b, c, 0, _K[5]);
+  s256rnd(c, d, e, f, g, h, a, b, 0, _K[6]);
+  s256rnd(b, c, d, e, f, g, h, a, 0, _K[7]);
+  s256rnd(a, b, c, d, e, f, g, h, 0, _K[8]);
+  s256rnd(h, a, b, c, d, e, f, g, 0, _K[9]);
+  s256rnd(g, h, a, b, c, d, e, f, 0, _K[10]);
+  s256rnd(f, g, h, a, b, c, d, e, 0, _K[11]);
+  s256rnd(e, f, g, h, a, b, c, d, 0, _K[12]);
+  s256rnd(d, e, f, g, h, a, b, c, 0, _K[13]);
+  s256rnd(c, d, e, f, g, h, a, b, 0, _K[14]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[15]);
 
   w[0] = w[0] + s0(0) + 0 + s1(0);
   w[1] = 0 + s0(0) + 0 + s1(w[15]);
@@ -246,22 +246,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = 0 + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[16]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[17]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[18]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[19]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[20]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[21]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[22]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[23]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[24]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[25]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[26]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[27]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[28]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[29]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[30]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[31]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[16]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[17]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[18]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[19]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[20]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[21]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[22]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[23]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[24]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[25]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[26]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[27]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[28]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[29]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[30]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[31]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -280,22 +280,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[32]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[33]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[34]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[35]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[36]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[37]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[38]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[39]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[40]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[41]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[42]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[43]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[44]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[45]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[46]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[47]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[32]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[33]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[34]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[35]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[36]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[37]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[38]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[39]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[40]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[41]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[42]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[43]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[44]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[45]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[46]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[47]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -314,22 +314,22 @@ void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[48]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[49]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[50]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[51]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[52]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[53]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[54]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[55]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[56]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[57]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[58]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[59]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[60]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[61]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[62]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[63]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[48]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[49]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[50]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[51]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[52]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[53]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[54]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[55]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[56]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[57]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[58]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[59]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[60]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[61]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[62]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[63]);
 
   digest[0] = tmp[0] + a;
   digest[1] = tmp[1] + b;
@@ -369,22 +369,22 @@ void sha256_key_compressed(const uint x[8], uint yParity, uint digest[8])
   g = _IV[6];
   h = _IV[7];
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[0]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[1]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[2]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[3]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[4]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[5]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[6]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[7]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[8]);
-  round(h, a, b, c, d, e, f, g, 0, _K[9]);
-  round(g, h, a, b, c, d, e, f, 0, _K[10]);
-  round(f, g, h, a, b, c, d, e, 0, _K[11]);
-  round(e, f, g, h, a, b, c, d, 0, _K[12]);
-  round(d, e, f, g, h, a, b, c, 0, _K[13]);
-  round(c, d, e, f, g, h, a, b, 0, _K[14]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[15]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[0]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[1]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[2]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[3]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[4]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[5]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[6]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[7]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[8]);
+  s256rnd(h, a, b, c, d, e, f, g, 0, _K[9]);
+  s256rnd(g, h, a, b, c, d, e, f, 0, _K[10]);
+  s256rnd(f, g, h, a, b, c, d, e, 0, _K[11]);
+  s256rnd(e, f, g, h, a, b, c, d, 0, _K[12]);
+  s256rnd(d, e, f, g, h, a, b, c, 0, _K[13]);
+  s256rnd(c, d, e, f, g, h, a, b, 0, _K[14]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[15]);
 
   w[0] = w[0] + s0(w[1]) + 0 + s1(0);
   w[1] = w[1] + s0(w[2]) + 0 + s1(w[15]);
@@ -403,22 +403,22 @@ void sha256_key_compressed(const uint x[8], uint yParity, uint digest[8])
   w[14] = 0 + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[16]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[17]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[18]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[19]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[20]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[21]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[22]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[23]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[24]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[25]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[26]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[27]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[28]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[29]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[30]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[31]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[16]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[17]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[18]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[19]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[20]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[21]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[22]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[23]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[24]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[25]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[26]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[27]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[28]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[29]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[30]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[31]);
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
   w[1] = w[1] + s0(w[2]) + w[10] + s1(w[15]);
@@ -437,22 +437,22 @@ void sha256_key_compressed(const uint x[8], uint yParity, uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[32]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[33]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[34]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[35]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[36]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[37]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[38]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[39]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[40]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[41]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[42]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[43]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[44]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[45]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[46]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[47]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[32]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[33]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[34]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[35]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[36]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[37]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[38]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[39]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[40]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[41]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[42]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[43]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[44]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[45]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[46]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[47]);
 
 
   w[0] = w[0] + s0(w[1]) + w[9] + s1(w[14]);
@@ -472,22 +472,22 @@ void sha256_key_compressed(const uint x[8], uint yParity, uint digest[8])
   w[14] = w[14] + s0(w[15]) + w[7] + s1(w[12]);
   w[15] = w[15] + s0(w[0]) + w[8] + s1(w[13]);
 
-  round(a, b, c, d, e, f, g, h, w[0], _K[48]);
-  round(h, a, b, c, d, e, f, g, w[1], _K[49]);
-  round(g, h, a, b, c, d, e, f, w[2], _K[50]);
-  round(f, g, h, a, b, c, d, e, w[3], _K[51]);
-  round(e, f, g, h, a, b, c, d, w[4], _K[52]);
-  round(d, e, f, g, h, a, b, c, w[5], _K[53]);
-  round(c, d, e, f, g, h, a, b, w[6], _K[54]);
-  round(b, c, d, e, f, g, h, a, w[7], _K[55]);
-  round(a, b, c, d, e, f, g, h, w[8], _K[56]);
-  round(h, a, b, c, d, e, f, g, w[9], _K[57]);
-  round(g, h, a, b, c, d, e, f, w[10], _K[58]);
-  round(f, g, h, a, b, c, d, e, w[11], _K[59]);
-  round(e, f, g, h, a, b, c, d, w[12], _K[60]);
-  round(d, e, f, g, h, a, b, c, w[13], _K[61]);
-  round(c, d, e, f, g, h, a, b, w[14], _K[62]);
-  round(b, c, d, e, f, g, h, a, w[15], _K[63]);
+  s256rnd(a, b, c, d, e, f, g, h, w[0], _K[48]);
+  s256rnd(h, a, b, c, d, e, f, g, w[1], _K[49]);
+  s256rnd(g, h, a, b, c, d, e, f, w[2], _K[50]);
+  s256rnd(f, g, h, a, b, c, d, e, w[3], _K[51]);
+  s256rnd(e, f, g, h, a, b, c, d, w[4], _K[52]);
+  s256rnd(d, e, f, g, h, a, b, c, w[5], _K[53]);
+  s256rnd(c, d, e, f, g, h, a, b, w[6], _K[54]);
+  s256rnd(b, c, d, e, f, g, h, a, w[7], _K[55]);
+  s256rnd(a, b, c, d, e, f, g, h, w[8], _K[56]);
+  s256rnd(h, a, b, c, d, e, f, g, w[9], _K[57]);
+  s256rnd(g, h, a, b, c, d, e, f, w[10], _K[58]);
+  s256rnd(f, g, h, a, b, c, d, e, w[11], _K[59]);
+  s256rnd(e, f, g, h, a, b, c, d, w[12], _K[60]);
+  s256rnd(d, e, f, g, h, a, b, c, w[13], _K[61]);
+  s256rnd(c, d, e, f, g, h, a, b, w[14], _K[62]);
+  s256rnd(b, c, d, e, f, g, h, a, w[15], _K[63]);
 
   a += _IV[0];
   b += _IV[1];
@@ -604,7 +604,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   const uint x8 = 0x00000080;
   const uint x14 = 256;
 
-  /* round 1 */
+  /* s256rnd 1 */
   FF(a1, b1, c1, d1, e1, x[0], 11);
   FF(e1, a1, b1, c1, d1, x[1], 14);
   FF(d1, e1, a1, b1, c1, x[2], 15);
@@ -622,7 +622,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   FF(b1, c1, d1, e1, a1, x14, 9);
   FF(a1, b1, c1, d1, e1, 0, 8);
 
-  /* round 2 */
+  /* s256rnd 2 */
   GG(e1, a1, b1, c1, d1, x[7], 7);
   GG(d1, e1, a1, b1, c1, x[4], 6);
   GG(c1, d1, e1, a1, b1, 0, 8);
@@ -640,7 +640,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   GG(a1, b1, c1, d1, e1, 0, 13);
   GG(e1, a1, b1, c1, d1, x8, 12);
 
-  /* round 3 */
+  /* s256rnd 3 */
   HH(d1, e1, a1, b1, c1, x[3], 11);
   HH(c1, d1, e1, a1, b1, 0, 13);
   HH(b1, c1, d1, e1, a1, x14, 6);
@@ -658,7 +658,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   HH(e1, a1, b1, c1, d1, x[5], 7);
   HH(d1, e1, a1, b1, c1, 0, 5);
 
-  /* round 4 */
+  /* s256rnd 4 */
   II(c1, d1, e1, a1, b1, x[1], 11);
   II(b1, c1, d1, e1, a1, 0, 12);
   II(a1, b1, c1, d1, e1, 0, 14);
@@ -676,7 +676,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   II(d1, e1, a1, b1, c1, x[6], 5);
   II(c1, d1, e1, a1, b1, x[2], 12);
 
-  /* round 5 */
+  /* s256rnd 5 */
   JJ(b1, c1, d1, e1, a1, x[4], 9);
   JJ(a1, b1, c1, d1, e1, x[0], 15);
   JJ(e1, a1, b1, c1, d1, x[5], 5);
@@ -700,7 +700,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   uint d2 = _RIPEMD160_IV3;
   uint e2 = _RIPEMD160_IV4;
 
-  /* parallel round 1 */
+  /* parallel s256rnd 1 */
   JJJ(a2, b2, c2, d2, e2, x[5], 8);
   JJJ(e2, a2, b2, c2, d2, x14, 9);
   JJJ(d2, e2, a2, b2, c2, x[7], 9);
@@ -718,7 +718,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   JJJ(b2, c2, d2, e2, a2, x[3], 12);
   JJJ(a2, b2, c2, d2, e2, 0, 6);
 
-  /* parallel round 2 */
+  /* parallel s256rnd 2 */
   III(e2, a2, b2, c2, d2, x[6], 9);
   III(d2, e2, a2, b2, c2, 0, 13);
   III(c2, d2, e2, a2, b2, x[3], 15);
@@ -736,7 +736,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   III(a2, b2, c2, d2, e2, x[1], 13);
   III(e2, a2, b2, c2, d2, x[2], 11);
 
-  /* parallel round 3 */
+  /* parallel s256rnd 3 */
   HHH(d2, e2, a2, b2, c2, 0, 9);
   HHH(c2, d2, e2, a2, b2, x[5], 7);
   HHH(b2, c2, d2, e2, a2, x[1], 15);
@@ -754,7 +754,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   HHH(e2, a2, b2, c2, d2, x[4], 7);
   HHH(d2, e2, a2, b2, c2, 0, 5);
 
-  /* parallel round 4 */
+  /* parallel s256rnd 4 */
   GGG(c2, d2, e2, a2, b2, x8, 15);
   GGG(b2, c2, d2, e2, a2, x[6], 5);
   GGG(a2, b2, c2, d2, e2, x[4], 8);
@@ -772,7 +772,7 @@ void ripemd160_sha256(const uint x[8], uint digest[5])
   GGG(d2, e2, a2, b2, c2, 0, 15);
   GGG(c2, d2, e2, a2, b2, x14, 8);
 
-  /* parallel round 5 */
+  /* parallel s256rnd 5 */
   FFF(b2, c2, d2, e2, a2, 0, 8);
   FFF(a2, b2, c2, d2, e2, 0, 5);
   FFF(e2, a2, b2, c2, d2, 0, 12);
@@ -809,7 +809,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   const uint x8 = 0x00000080;
   const uint x14 = 256;
 
-  /* round 1 */
+  /* s256rnd 1 */
   FF(a1, b1, c1, d1, e1, x[0], 11);
   FF(e1, a1, b1, c1, d1, x[1], 14);
   FF(d1, e1, a1, b1, c1, x[2], 15);
@@ -827,7 +827,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   FF(b1, c1, d1, e1, a1, x14, 9);
   FF(a1, b1, c1, d1, e1, 0, 8);
 
-  /* round 2 */
+  /* s256rnd 2 */
   GG(e1, a1, b1, c1, d1, x[7], 7);
   GG(d1, e1, a1, b1, c1, x[4], 6);
   GG(c1, d1, e1, a1, b1, 0, 8);
@@ -845,7 +845,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   GG(a1, b1, c1, d1, e1, 0, 13);
   GG(e1, a1, b1, c1, d1, x8, 12);
 
-  /* round 3 */
+  /* s256rnd 3 */
   HH(d1, e1, a1, b1, c1, x[3], 11);
   HH(c1, d1, e1, a1, b1, 0, 13);
   HH(b1, c1, d1, e1, a1, x14, 6);
@@ -863,7 +863,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   HH(e1, a1, b1, c1, d1, x[5], 7);
   HH(d1, e1, a1, b1, c1, 0, 5);
 
-  /* round 4 */
+  /* s256rnd 4 */
   II(c1, d1, e1, a1, b1, x[1], 11);
   II(b1, c1, d1, e1, a1, 0, 12);
   II(a1, b1, c1, d1, e1, 0, 14);
@@ -881,7 +881,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   II(d1, e1, a1, b1, c1, x[6], 5);
   II(c1, d1, e1, a1, b1, x[2], 12);
 
-  /* round 5 */
+  /* s256rnd 5 */
   JJ(b1, c1, d1, e1, a1, x[4], 9);
   JJ(a1, b1, c1, d1, e1, x[0], 15);
   JJ(e1, a1, b1, c1, d1, x[5], 5);
@@ -905,7 +905,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   uint d2 = _RIPEMD160_IV3;
   uint e2 = _RIPEMD160_IV4;
 
-  /* parallel round 1 */
+  /* parallel s256rnd 1 */
   JJJ(a2, b2, c2, d2, e2, x[5], 8);
   JJJ(e2, a2, b2, c2, d2, x14, 9);
   JJJ(d2, e2, a2, b2, c2, x[7], 9);
@@ -923,7 +923,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   JJJ(b2, c2, d2, e2, a2, x[3], 12);
   JJJ(a2, b2, c2, d2, e2, 0, 6);
 
-  /* parallel round 2 */
+  /* parallel s256rnd 2 */
   III(e2, a2, b2, c2, d2, x[6], 9);
   III(d2, e2, a2, b2, c2, 0, 13);
   III(c2, d2, e2, a2, b2, x[3], 15);
@@ -941,7 +941,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   III(a2, b2, c2, d2, e2, x[1], 13);
   III(e2, a2, b2, c2, d2, x[2], 11);
 
-  /* parallel round 3 */
+  /* parallel s256rnd 3 */
   HHH(d2, e2, a2, b2, c2, 0, 9);
   HHH(c2, d2, e2, a2, b2, x[5], 7);
   HHH(b2, c2, d2, e2, a2, x[1], 15);
@@ -959,7 +959,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   HHH(e2, a2, b2, c2, d2, x[4], 7);
   HHH(d2, e2, a2, b2, c2, 0, 5);
 
-  /* parallel round 4 */
+  /* parallel s256rnd 4 */
   GGG(c2, d2, e2, a2, b2, x8, 15);
   GGG(b2, c2, d2, e2, a2, x[6], 5);
   GGG(a2, b2, c2, d2, e2, x[4], 8);
@@ -977,7 +977,7 @@ void ripemd160_sha256_no_final(const uint* x, uint* digest)
   GGG(d2, e2, a2, b2, c2, 0, 15);
   GGG(c2, d2, e2, a2, b2, x14, 8);
 
-  /* parallel round 5 */
+  /* parallel s256rnd 5 */
   FFF(b2, c2, d2, e2, a2, 0, 8);
   FFF(a2, b2, c2, d2, e2, 0, 5);
   FFF(e2, a2, b2, c2, d2, 0, 12);
