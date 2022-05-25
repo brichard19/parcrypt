@@ -37,7 +37,7 @@ constant uint _IV[8] = {
     (h) += (t) + MAJ((a), (b), (c)) + (rotr((a), 2) ^ rotr((a), 13) ^ rotr((a), 22))
 
 
-void sha256PublicKey(const uint x[8], const uint y[8], uint digest[8])
+void sha256_key_uncompressed(const uint x[8], const uint y[8], uint digest[8])
 {
   uint a, b, c, d, e, f, g, h;
   uint w[16];
@@ -1007,11 +1007,11 @@ uint endian(uint x)
   return (x << 24) | ((x << 8) & 0x00ff0000) | ((x >> 8) & 0x0000ff00) | (x >> 24);
 }
 
-void hash_key(uint256_t x, uint256_t y, uint* digestOut)
+void hash_key_uncompressed(uint256_t x, uint256_t y, uint* digestOut)
 {
   uint hash[8];
 
-  sha256PublicKey(x.v, y.v, hash);
+  sha256_key_uncompressed(x.v, y.v, hash);
 
   // Swap to little-endian
   for(int i = 0; i < 8; i++) {
@@ -1036,7 +1036,7 @@ void hash_key_compressed(uint256_t x, uint yParity, uint* digest_out)
 }
 
 
-kernel void hash_public_keys(const global uint256_t* x_in,
+kernel void hash_public_keys_compressed(const global uint256_t* x_in,
   const global uint256_t* y_in,
   const global uint* target,
   uint total_keys,
@@ -1052,6 +1052,35 @@ kernel void hash_public_keys(const global uint256_t* x_in,
     uint256_t x = x_in[i];
 
     hash_key_compressed(x, readLSW256k(y_in, i), digest);
+
+    if(digest[0] == target[0]
+      && digest[1] == target[1]
+      && digest[2] == target[2]
+      && digest[3] == target[3]
+      && digest[4] == target[4]) {
+
+      *result_flag = 1;
+      *result_idx = i;
+    }
+  }
+}
+
+kernel void hash_public_keys_uncompressed(const global uint256_t* x_in,
+  const global uint256_t* y_in,
+  const global uint* target,
+  uint total_keys,
+  global int* result_flag,
+  global uint* result_idx)
+{
+  uint gid = get_global_id(0);
+  uint dim = get_global_size(0);
+
+  for(uint i = gid; i < total_keys; i += dim) {
+    uint digest[5];
+
+    uint256_t x = x_in[i];
+    uint256_t y = y_in[i];
+    hash_key_uncompressed(x, y, digest);
 
     if(digest[0] == target[0]
       && digest[1] == target[1]

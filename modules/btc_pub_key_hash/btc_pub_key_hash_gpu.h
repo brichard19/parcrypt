@@ -43,6 +43,7 @@ private:
   gpulib::DeviceMemory _dev_result_flag;
   gpulib::DeviceMemory _dev_result_idx;
  
+  bool _compressed = true;
 
   size_t _mem_usage = 128 * 1024 * 1024;
   std::string _target;

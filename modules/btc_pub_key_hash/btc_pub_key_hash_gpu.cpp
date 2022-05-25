@@ -46,12 +46,10 @@ void BTCPubKeyHashGPU::set_mem_usage_bytes(size_t usage)
 
 void BTCPubKeyHashGPU::init(secp256k1::uint256 key_start, secp256k1::uint256 key_end, const std::string& target, bool compressed)
 {
+  _compressed = compressed;
+
   if(_device->get_type() != gpulib::DeviceType::OpenCL) {
     throw std::invalid_argument("Only OpenCL devices are supported");
-  }
-
-  if(compressed == false) {
-    throw std::invalid_argument("Uncompressed keys not supported");
   }
 
   if(key_start < 1) {
@@ -155,18 +153,25 @@ void BTCPubKeyHashGPU::setup_kernels()
 
   _kernel_increment_keys_double = _module->load_kernel("increment_keys_with_double");
 
-  _kernel_hash_keys = _module->load_kernel("hash_public_keys");
-
+  if(_compressed) {
+    _kernel_hash_keys = _module->load_kernel("hash_public_keys_compressed");
+  } else {
+    _kernel_hash_keys = _module->load_kernel("hash_public_keys_uncompressed");
+  }
   _kernels_loaded = true;
 }
 
 bool BTCPubKeyHashGPU::are_kernels_tuned()
 {
-  std::vector<std::string> kernel_names = {
-    "increment_keys",
-    "increment_keys_double",
-    "hash_keys"
-  };
+  std::vector<std::string> kernel_names;
+  kernel_names.push_back("increment_keys");
+  kernel_names.push_back("increment_keys_double");
+
+  if(_compressed) {
+    kernel_names.push_back("hash_public_keys_compressed");
+  } else {
+    kernel_names.push_back("hash_public_keys_uncompressed");
+  }
 
   bool tuned = true;
   for(auto n : kernel_names) {
@@ -191,9 +196,13 @@ void BTCPubKeyHashGPU::load_tuning()
   _kernel_increment_keys_double->set_block_size({ block_size, 1, 1 });
   _kernel_increment_keys_double->set_grid_size({ grid_size, 1, 1 });
 
-  block_size = util::parse_int(_settings.get(_device_id + "hash_keys_block_size"));
-  grid_size = util::parse_int(_settings.get(_device_id + "hash_keys_grid_size"));
-
+  if(_compressed) {
+    block_size = util::parse_int(_settings.get(_device_id + "hash_public_keys_compressed_block_size"));
+    grid_size = util::parse_int(_settings.get(_device_id + "hash_public_keys_compressed_grid_size"));
+  } else {
+    block_size = util::parse_int(_settings.get(_device_id + "hash_public_keys_uncompressed_block_size"));
+    grid_size = util::parse_int(_settings.get(_device_id + "hash_public_keys_uncompressed_grid_size"));
+  }
   _kernel_hash_keys->set_block_size({ block_size, 1, 1 });
   _kernel_hash_keys->set_grid_size({ grid_size, 1, 1 });
 }
@@ -236,7 +245,12 @@ void BTCPubKeyHashGPU::tune_kernels()
 {
   tune_kernel(_kernel_increment_keys, "increment_keys");
   tune_kernel(_kernel_increment_keys_double, "increment_keys_double");
-  tune_kernel(_kernel_hash_keys, "hash_keys");
+
+  if(_compressed) {
+    tune_kernel(_kernel_hash_keys, "hash_public_keys_compressed");
+  } else {
+    tune_kernel(_kernel_hash_keys, "hash_public_keys_uncompressed");
+  }
 }
 
 void BTCPubKeyHashGPU::allocate_memory()
