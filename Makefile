@@ -58,6 +58,9 @@ main:
 
 all:	${TARGETS}
 
+unittests:	dir_unittests
+	$(MAKE) -j8 dir_unittests
+
 dir_fmt:
 	$(MAKE) --directory third_party/fmt
 
@@ -91,6 +94,9 @@ dir_modules:
 dir_parcrypt: dir_json11 dir_fmt dir_gpulib dir_address dir_parcrypt_lib dir_logger dir_platform dir_secp256k1 dir_util dir_modules
 	$(MAKE) --directory parcrypt
 
+dir_unittests: dir_json11 dir_fmt dir_gpulib dir_address dir_parcrypt_lib dir_logger dir_platform dir_secp256k1 dir_util dir_modules
+	$(MAKE) --directory unit_tests
+
 clean:
 	$(MAKE) --directory util clean
 	$(MAKE) --directory address clean
@@ -100,6 +106,7 @@ clean:
 	$(MAKE) --directory gpu clean
 	$(MAKE) --directory parcrypt clean
 	$(MAKE) --directory parcrypt_lib clean
+	$(MAKE) --directory unit_tests clean
 	$(MAKE) --directory modules clean
 	$(MAKE) --directory third_party/fmt clean
 	$(MAKE) --directory third_party/json11 clean
