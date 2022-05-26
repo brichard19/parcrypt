@@ -6,6 +6,34 @@
 
 #include "modules/btc_pub_key_hash/btc_pub_key_hash_gpu.h"
 
+namespace {
+
+bool parse_target(const std::string& target, bool& compressed, std::string& address)
+{
+  auto values = util::split(target, "::");
+
+  if(values.size() == 2) {
+    // compression and address
+    if(values[0] == "compressed") {
+      compressed = true;
+    } else if (values[0] == "uncompressed") {
+      compressed = false;
+    } else {
+      return false;
+    }
+    address = values[1];
+  } else if (values.size() == 1) {
+    // address only
+    address = values[0];
+  } else {
+    return false;
+  }
+
+  return true;
+}
+
+}
+
 void parcrypt::btc_pubkey_worker(WorkerThreadState* state, parcrypt::IWorkItem* work_item_ptr)
 {
   parcrypt::BruteForceWorkItem* work_item = reinterpret_cast<parcrypt::BruteForceWorkItem*>(work_item_ptr);
@@ -15,7 +43,14 @@ void parcrypt::btc_pubkey_worker(WorkerThreadState* state, parcrypt::IWorkItem* 
 
   device.set_mem_usage(state->gpu_config.mem_usage);
 
-  device.init(work_item->start(), work_item->end(), work_item->target());
+  bool compression;
+  std::string address;
+
+  if(!parse_target(work_item->target(), compression, address)) {
+    throw std::invalid_argument("Invalid target");
+  }
+
+  device.init(work_item->start(), work_item->end(), address, compression);
 
   state->set_state(WorkerState::Running);
 
