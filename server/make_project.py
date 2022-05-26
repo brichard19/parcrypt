@@ -114,7 +114,7 @@ def main():
   share_size_bits = 36
   start = util.int_to_hex(1)
   end = util.int_to_hex(2**256 - 2**32 - 977 - 1)
-
+  compressed = True
   use_preset = False
 
   req = {}
@@ -132,6 +132,8 @@ def main():
   parser.add_argument('--share-size-bits', type=int, required=False, help='size of shares in bits')
   parser.add_argument('--challenge', type=int, required=False, help='use address from Bitcoin challenge')
   parser.add_argument('--list-challenge', action='store_true', required=False, help='list challenge addresses and exit')
+  parser.add_argument('--compressed', action='store_true', required=False, help='Compressed public key(default)')
+  parser.add_argument('--uncompressed', action='store_true', required=False, help='Uncompressed public key')
 
   args = vars(parser.parse_args())
 
@@ -150,6 +152,10 @@ def main():
     print('--address is required')
     parser.parse_args(['--help'])
 
+  if args['compressed'] == True and args['uncompressed'] == True:
+    print('Cannot use --compressed and --uncompressed at the same time')
+    return 1
+ 
   project_name = args['name']
 
   if args['address'] != None:
@@ -177,6 +183,10 @@ def main():
   if use_preset and args['address'] != None:
     print('--challenge cannot be used with --address')
     return 1
+  if args['compressed']:
+    compressed = True
+  if args['uncompressed']:
+    compressed = False
 
   if share_size_bits > 56:
     print('Invalid share size')
@@ -198,7 +208,7 @@ def main():
   payload['end'] = end
   payload['sharesize'] = share_size_bits
   payload['address'] = address
-  payload['compression'] = 'compressed'
+  payload['compression'] = 'compressed' if compressed else 'uncompressed'
   json['payload'] = payload
 
   url = 'http://{0}:{1}'.format(hostname, port)

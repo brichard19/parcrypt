@@ -20,7 +20,10 @@ class BTCPubKeyHash(BruteForceProject.BruteForceProject):
 
     p = payload
 
-    p['target'] = payload['address']
+    if p['compression'] == 'compressed':
+      p['target'] = 'compressed::' + payload['address']
+    else:
+      p['target'] = 'uncompressed::' + payload['address']
 
     self.write_info()
 
