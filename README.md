@@ -44,7 +44,7 @@ For example, to search for the private key to `1DeCk95yY3QkTH8RREeenxJZPvwCeQAqj
 python server/make_project.py --name test_project --address 1DeCk95yY3QkTH8RREeenxJZPvwCeQAqjw --start 1 --end 8000000000
 ```
 
-**Note:** Currently the software only supports egacy addresses. By default they are compressed. Use the `--uncompressed` option to specify that the address is uncompressed.
+**Note:** Currently the software only supports legacy addresses. By default they are compressed. Use the `--uncompressed` option to indicate the address is uncompressed.
 
 For convenience, the script includes the Bitcoin puzzle transaction addresses:
 ```
